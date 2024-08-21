@@ -15,11 +15,11 @@ export default function Search() {
   return (
     <main className="flex min-h-screen flex-col items-center justify-between p-24">
       <div className="z-10 w-full max-w-5xl items-center justify-between font-mono text-sm lg:flex">
-        <h1>Search Result</h1>
+      <h1 className="text-2xl text-pretty">Search Result</h1>
         <div>
           <a href="/">Back</a>
         </div>
-        <div className="z-10 w-full max-w-5xl items-center mt-80 h-[26vh] absolute border">
+        <div className="z-10 w-full max-w-5xl items-center mt-80 h-[26vh] absolute ">
           <ul>{listItems}</ul>
         </div>
       </div>

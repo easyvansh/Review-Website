@@ -22,7 +22,7 @@ export default function Review() {
   return (
     <main className="flex min-h-screen flex-col items-center justify-between p-24">
       <div className="z-10 w-full max-w-5xl items-center justify-between font-mono text-sm lg:flex">
-        <h1 className="text-2xl text-pretty text-cyan-300">Club / Coach / Ice Rink</h1>
+        <h1 className="text-2xl text-pretty">Club / Coach / Ice Rink</h1>
         <div>
           <a href="/">Back</a>
         </div>
@@ -59,18 +59,18 @@ export default function Review() {
             {reviews.map((review, index) => (
               <div
                 key={index}
-                className="z-10 w-full relative border flex items-start justify-start p-4"
+                className="z-10 w-full relative flex items-start justify-start p-4"
               >
                 <p>{review}</p>
               </div>
             ))}
-            <div className="z-10 w-full relative border flex items-start justify-start p-4">
+            <div className="z-10 w-full relative flex items-start justify-start p-4">
               <p>
                 lorem ipsum dolor sit amet, consectetur adip et lorem ipsum
                 dolor sit amet, consectetur adip etlorem ipsum dolor sit amet,
               </p>
           </div>
-            <div className="z-10 w-full relative border flex items-start justify-start p-4">
+            <div className="z-10 w-full relative flex items-start justify-start p-4">
               <p>
                 lorem ipsum dolor sit amet, consectetur adip et lorem ipsum
                 dolor sit amet, consectetur adip etlorem ipsum dolor sit amet,
