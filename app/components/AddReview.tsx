@@ -4,12 +4,18 @@ import { collection, addDoc } from "firebase/firestore";
 import { UserAuth } from "../context/AuthContext";
 
 const AddReview = () => {
-  const [review, setReview] = useState("");
-  const [userName, setUserName] = useState("");
+  const { user, googleSignIn } = UserAuth();
   const [userId, setUserId] = useState("");
-  const { user, googleSignIn, } = UserAuth();
+  const [userIcon, setUserIcon] = useState("");
+  const [userName, setUserName] = useState("");
+  const [type,setType] = useState("");
+  const [userLevel, setUserLevel] = useState("beginner");
+  const [rating, setRating] = useState(1);
+  const [review, setReview] = useState("");
 
   const [loading, setLoading] = useState(true);
+
+  // Reviews Database - Icon - Name (Level) - Rating - Date - Review Text
 
   const handleSubmit = async (event) => {
     event.preventDefault();
@@ -19,12 +25,16 @@ const AddReview = () => {
         review,
         userName: user.displayName,
         userId: user.uid,
-        created: new Date().toISOString(),
+        userIcon: user.photoURL,
+        userLevel,
+        rating,
+        created: new Date(),
       });
       console.log("Document written with ID: ", docRef.id);
       setReview(" ");
       setUserName("");
       setUserId("");
+      setUserIcon("");
     } catch (error) {
       console.error("Error adding document: ", error);
     }
@@ -74,7 +84,34 @@ const AddReview = () => {
           <form onSubmit={handleSubmit}>
             <div className="flex flex-row  justify-center items-start py-10">
               <label htmlFor="userName">Writing As:</label>
+
               <p className="mx-10  items-center ">{user.displayName}</p>
+
+              <label htmlFor="userLevel">Level:</label>
+              <select
+                id="userLevel"
+                value={userLevel}
+                onChange={(e) => setUserLevel(e.target.value)}
+                required
+                className="bg-white bg-opacity-15 mx-10 px-10 py-5 items-center justify-center flex"
+              >
+                <option value="beginner">Beginner</option>
+                <option value="intermediate">Intermediate</option>
+                <option value="professional">Professional</option>
+              </select>
+
+              <label htmlFor="rating">Rating (1 to 10):</label>
+              <input
+                type="number"
+                id="rating"
+                value={rating}
+                onChange={(e) => setRating(parseInt(e.target.value))}
+                min="1"
+                max="10"
+                required
+                className="bg-white bg-opacity-15 mx-10 px-10 py-5 items-center justify-center flex"
+              />
+
               <label htmlFor="review">Review:</label>
               <textarea
                 className="bg-white bg-opacity-15  mx-10 px-10 py-5 items-center justify-center flex"
