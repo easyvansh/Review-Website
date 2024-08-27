@@ -1,0 +1,72 @@
+Protoype - Alpha
+
+
+Things we want in our website(initially) :-
+
+REVIEW WEBSITE
+
+
+1- Home Page and Search - 
+	
+	i - Home Page - Search Bar ( from Database - No Filter - But Data with Tag )
+		
+2 - Result Page 
+	
+	i - Results  - Type
+		
+	ii - Icon - Title - Type - Review Count - Avg Rating(1-10)
+
+
+3 - Review Page - ICE RINK/ COACH /CLUB
+
+	i - Summary Section 
+
+		- Icon - Name - Title - Info - Review Count - Avg Rating
+
+	ii - Add New Review (Account Authentication)
+
+	iii - Reviews 
+		- Icon - Name (Level) - Rating - Date - Review Text
+
+
+
+
+
+Databases Required
+
+1 - Database of All - ICE RINK/ COACH /CLUB  -> ONE DATABASE
+
+	Icon - Name - Title - Type - Review Count - Avg Rating(1-10) - Info - Link
+
+2 - Database of Reviews
+
+	- Icon - Name (Level) - Rating - Date - Review Text - Rating = + Reviews = Avg
+
+3 - Database of Users - Login/ SignUp - Detail -> (User Info) Page -> Add Review
+
+
+DATABASE BASICS:
+
+POST, GET, PUT, and DELETE.
+
+POST is for adding a new database entry
+PUT is for updating an existing database entry
+GET is for fetching the existing database entry
+DELETE is for deleting the existing database entry
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
