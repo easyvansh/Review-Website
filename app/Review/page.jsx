@@ -1,8 +1,8 @@
 "use client";
 
 import { useState } from "react";
-
-
+import AddReview from "../components/AddReview";
+import ListReviews from "../components/ListReviews";
 
 export default function Review() {
   const [review, setReview] = useState("");
@@ -20,15 +20,15 @@ export default function Review() {
   };
 
   return (
-    <main className="flex min-h-screen flex-col items-center justify-between p-24">
-      <div className="z-10 w-full max-w-5xl items-center justify-between font-mono text-sm lg:flex">
+    <main className="flex h-screen flex-col items-center justify-between font-mono py-10 px-10">
+      <div>
         <h1 className="text-2xl text-pretty">Club / Coach / Ice Rink</h1>
         <div>
           <a href="/">Back</a>
         </div>
-        <div className="z-10 w-full max-w-5xl items-center mt-80 h-[26vh] absolute">
-          Summary
-          <div className="z-10 w-full max-w-5xl items-center h-[30vh] relative border p-4">
+        <div className=" max-w-6xl items-center  h-[46vh]   my-5">
+          <h1> Summary</h1>
+          <div className="  items-center h-[40vh] relative p-4">
             Summary of Rink/Club/Coach - Lorem Ipsum Summary of Rink/Club/Coach
             - Lorem Ipsum Summary of Rink/Club/Coach - Lorem Ipsum Summary of
             Rink/Club/Coach - Lorem Ipsum Summary of Rink/Club/Coach - Lorem
@@ -36,46 +36,16 @@ export default function Review() {
             Rink/Club/Coach - Lorem Ipsum Summary of Rink/Club/Coach - Lorem
             IpsumSummary of Rink/Club/Coach - Lorem Ipsum Summary of
             Rink/Club/Coach - Lorem Ipsum Summary of Rink/Club/Coach - Lorem
-            Ipsum Summary of Rink/Club/Coach - Lorem Ipsum Summary 
+            Ipsum Summary of Rink/Club/Coach - Lorem Ipsum Summary
             Rink/Club/Coach - Lorem Ipsum Summary of Rink/Club/Coach - Lorem
-            Ipsum Summary of Rink/Club/Coach - Lorem Ipsum Summary 
-            <div className="z-10 w-full h-[12vh] relative flex items-end justify-between p-4 ">
-              <textarea
-                className="border rounded p-2 w-full mr-4 bg-inherit"
-                value={review}
-                onChange={handleInputChange}
-                placeholder="Write your review..."
-              />
-              <button
-                className="bg-blue-500 text-white p-2 rounded"
-                onClick={handleAddReview}
-              >
-                Rate
-              </button>
+            Ipsum Summary of Rink/Club/Coach - Lorem Ipsum Summary
+            <div className="absolute">
+              <AddReview />
             </div>
           </div>
-          <div className="z-10 w-full max-w-5xl mt-10 h-[36vh] absolute border p-4">
-            Reviews
-            {reviews.map((review, index) => (
-              <div
-                key={index}
-                className="z-10 w-full relative flex items-start justify-start p-4"
-              >
-                <p>{review}</p>
-              </div>
-            ))}
-            <div className="z-10 w-full relative flex items-start justify-start p-4">
-              <p>
-                lorem ipsum dolor sit amet, consectetur adip et lorem ipsum
-                dolor sit amet, consectetur adip etlorem ipsum dolor sit amet,
-              </p>
-          </div>
-            <div className="z-10 w-full relative flex items-start justify-start p-4">
-              <p>
-                lorem ipsum dolor sit amet, consectetur adip et lorem ipsum
-                dolor sit amet, consectetur adip etlorem ipsum dolor sit amet,
-              </p>
-          </div>
+          <div className="z-10 w-full max-w-5xl mt-10 h-[36vh] absolute  p-4">
+            <ListReviews/>
+            
           </div>
         </div>
       </div>
