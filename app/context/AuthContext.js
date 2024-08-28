@@ -6,35 +6,35 @@ import {
   GoogleAuthProvider,
 } from "firebase/auth";
 import auth from "@/utils/auth";
+import { doc, getDoc, setDoc } from "firebase/firestore";
+import db from "@/utils/firestore";
 
 const AuthContext = createContext();
 
 export const AuthContextProvider = ({ children }) => {
   const [user, setUser] = useState(null);
 
-  const googleSignIn = () => {
+  const googleSignIn = async (skatingLevel) => {
     const provider = new GoogleAuthProvider();
-    signInWithPopup(auth, provider)
-      .then((result) => {
-        // This gives you a Google Access Token. You can use it to access the Google API.
-        const credential = GoogleAuthProvider.credentialFromResult(result);
-        const token = credential.accessToken;
-        // The signed-in user info.
-        const user = result.user;
-        // IdP data available using getAdditionalUserInfo(result)
-        // ...
-      })
-      .catch((error) => {
-        // Handle Errors here.
-        const errorCode = error.code;
-        const errorMessage = error.message;
-        // The email of the user's account used.
-        const email = error.customData.email;
-        // The AuthCredential type that was used.
-        const credential = GoogleAuthProvider.credentialFromError(error);
-        // ...
+    const result = await signInWithPopup(auth, provider);
+    const loggedInUser = result.user;
+
+    // Check if user exists in db
+    const userDoc = await getDoc(doc(db, "users", loggedInUser.uid));
+    if (!userDoc.exists()) {
+      // If user doesn't exist, add to db
+      await setDoc(doc(db, "users", loggedInUser.uid), {
+        uid: loggedInUser.uid,
+        displayName: loggedInUser.displayName,
+        email: loggedInUser.email,
+        level:skatingLevel,
+        createdAt: new Date(),
       });
+    }
+
+    setUser(loggedInUser);
   };
+
 
   const logout = () => {
     signOut(auth)
