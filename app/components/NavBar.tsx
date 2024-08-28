@@ -1,18 +1,14 @@
 import Link from "next/link";
 import React, { useEffect, useState } from "react";
 import { UserAuth } from "../context/AuthContext";
+import { useRouter } from 'next/navigation';
 
 const NavBar = () => {
-  const { user, googleSignIn, logout } = UserAuth();
+  const { user, logout } = UserAuth();
   const [loading, setLoading] = useState(true);
+  const [isSigningUp, setIsSigningUp] = useState(false); // Track if the user is signing up
+  const router = useRouter();
 
-  const handleSignIn = async () => {
-    try {
-      await googleSignIn();
-    } catch (err) {
-      console.log(err);
-    }
-  };
   const handleSignOut = async () => {
     try {
       await logout();
@@ -29,7 +25,6 @@ const NavBar = () => {
     checkAuthentication();
   }, [user]);
 
-  console.log(user);
   return (
     <div className="h-20 w-full border-b-2 flex items-center justify-between">
       <ul className="flex">
@@ -43,18 +38,21 @@ const NavBar = () => {
       </ul>
       {loading ? null : !user ? (
           <ul className="flex">
-            <li className="p-2 cursor-pointer" onClick={handleSignIn}>
+            <li
+              className="p-2 cursor-pointer"
+              onClick={() => setIsSigningUp(false)}
+            >
               Login
             </li>
-            <li className="p-2 cursor-pointer" onClick={handleSignIn}>
-              Sign Up
-            </li>
-          </ul>
+            <li className="p-2 cursor-pointer" onClick={() => router.push("/signup")}>
+            Sign Up
+          </li>
+        </ul>
       ) : (
         <div>
           <ul className="flex">
             <li className="p-2">
-              <p>Welcome,{user.displayName.split(" ")[0]}</p>
+              <p>Welcome, {user.displayName.split(" ")[0]}</p>
             </li>
             <li className="p-2 cursor-pointer" onClick={handleSignOut}>
               Sign Out
