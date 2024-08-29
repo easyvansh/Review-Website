@@ -14,9 +14,10 @@ export default function Home() {
   return (
         <div className = "h-screen w-screen flex flex-col gap-4 justify-center items-center">
          <h1>Home</h1>
-         <SearchReviews/>
+         <SearchReviews onSearchResults={{}}/>
           <a href="/Review"> See REVIEWS</a>
           <a href="/addEntity"> Add Entity</a>
+          <a href="/entities"> SEE Entities</a>
           
          
          {/* 
