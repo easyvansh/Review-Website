@@ -6,22 +6,10 @@ import { collection, getDocs } from "firebase/firestore";
 import DeleteReview from "./DeleteReview";
 import { FaStar } from "react-icons/fa";
 
-const ListReviews = () => {
-  const [reviews, setReviews] = useState([]);
+const ListReviews = ({ reviews }) => {
 
-  useEffect(() => {
-    const fetchItems = async () => {
-      try {
-        const querySnapshot = await getDocs(collection(db, "reviews"));
-        setReviews(querySnapshot.docs.map((doc) => ({ ...doc.data(), id: doc.id })));
-      } catch (error) {
-        console.error("Error fetching reviews: ", error);
-      }
-    };
 
-    fetchItems();
-  }, []);
-
+  
   return (
     <div className="p-6 max-w-4xl mx-auto">
       <h2 className="text-2xl font-bold mb-6">List of Reviews</h2>

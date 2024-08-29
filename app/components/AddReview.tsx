@@ -1,143 +1,115 @@
-import React, { useState, useEffect } from "react";
-import db from "@/utils/firestore.js";
-import { collection, addDoc } from "firebase/firestore";
-import { UserAuth } from "../context/AuthContext";
+"use client";
 
-const AddReview = () => {
-  const { user, googleSignIn } = UserAuth();
-  const [userId, setUserId] = useState("");
-  const [userIcon, setUserIcon] = useState("");
-  const [userName, setUserName] = useState("");
-  const [type,setType] = useState("");
-  const [userLevel, setUserLevel] = useState("beginner");
-  const [rating, setRating] = useState(1);
-  const [review, setReview] = useState("");
+import React, { useEffect, useState } from "react";
+import { UserAuth } from "../context/AuthContext"; // Ensure this import path is correct
+import { collection, addDoc, serverTimestamp, getDocs, where, query } from "firebase/firestore";
+import db from "@/utils/firestore";
 
-  const [loading, setLoading] = useState(true);
+const AddReview = ({ entityId }) => {
+  const { user } = UserAuth(); // Destructure user from UserAuth
+  const [rating, setRating] = useState(0);
+  const [reviewText, setReviewText] = useState("");
+  const [error, setError] = useState("");
+  const [userDoc, setUserDoc] = useState(null);
 
-  // Reviews Database - Icon - Name (Level) - Rating - Date - Review Text
-  // entities/{entityId}/reviews: {
-  //   reviewId: {
-  //     userId: string, // Reference to user document
-  //     rating: number,
-  //     reviewText: string,
-  //     createdAt: timestamp
-  //   }
-  // }
-  const handleSubmit = async (event) => {
-    event.preventDefault();
+  useEffect(() => {
+    const fetchUserData = async () => {
+      
+      if (user && user.uid) {
+        try {
+          const q = query(
+            collection(db, "users"),
+            where("uid", "==", user.uid)
+          );
+          const querySnapshot = await getDocs(q);
+
+          if (!querySnapshot.empty) {
+            // Assuming there is only one document for the user
+            const userData = querySnapshot.docs[0].data();
+            setUserDoc(userData);
+            console.log(userData);
+          } else {
+            console.log("No such document!");
+          }
+        } catch (error) {
+          console.error("Error fetching user data:", error);
+        }
+      }
+    };
+
+    fetchUserData();
+  }, [user]);
+
+  const handleAddReview = async () => {
+    if (!user) {
+      setError("You must be logged in to add a review.");
+      return;
+    }
+
+    if (rating <= 0 || reviewText.trim() === "") {
+      setError("Please provide a rating and review text.");
+      return;
+    }
 
     try {
-      const docRef = await addDoc(collection(db, "reviews"), {
-        review,
+      const reviewRef = collection(db, `entities/${entityId}/reviews`);
+      console.log(user);
+      await addDoc(reviewRef, {
         userName: user.displayName,
         userId: user.uid,
         userIcon: user.photoURL,
-        userLevel,
+        userLevel: userDoc.level,
         rating,
-        created: new Date(),
+        reviewText,
+        createdAt: new Date(),
       });
-      console.log("Document written with ID: ", docRef.id);
-      setReview(" ");
-      setUserName("");
-      setUserId("");
-      setUserIcon("");
-    } catch (error) {
-      console.error("Error adding document: ", error);
+      console.log("Document written with ID: ", reviewRef.id);
+      setRating(0);
+      setReviewText("");
+      setError("");
+    } catch (e) {
+      console.error("Error adding review:", e);
+      setError("Failed to add review.");
     }
   };
-  const handleSubmitwithoutSignIn = async (event) => {
-    event.preventDefault();
-
-    try {
-      await googleSignIn();
-    } catch (err) {
-      console.log(err);
-    }
-  };
-
-  useEffect(() => {
-    const checkAuthentication = async () => {
-      await new Promise((resolve) => setTimeout(resolve, 50));
-      setLoading(false);
-    };
-    checkAuthentication();
-  }, [user]);
 
   return (
-    <div className="relative">
-      {loading ? null : !user ? (
+    <div className="flex flex-col gap-4">
+      <h3>Add Review</h3>
+      <div className="flex flex-row  justify-center items-start py-10">
+        <label htmlFor="userName">Writing As:</label>
+
+        <p className="mx-10  items-center ">{user.userName}</p>
+
+        {error && <p style={{ color: "red" }}>{error}</p>}
         <div>
-          <h2>Add Review</h2>
-          <form onSubmit={handleSubmitwithoutSignIn}>
-            <div className="flex flex-row  justify-center items-start py-10">
-              <label htmlFor="userName">User Name:</label>
-              <p className="mx-10  items-center justify-center flex flex-col">
-                Please SIGN IN
-              </p>
-
-              <button
-                type="submit"
-                className="bg-teal-300 bg-opacity-5  p-5 rounded-lg items-center justify-center flex flex-col"
-              >
-                Submit Review
-              </button>
-            </div>
-          </form>
+          <label htmlFor="rating">Rating (1 to 10):</label>
+          <input
+            type="number"
+            min="1"
+            max="10"
+            value={rating}
+            onChange={(e) => setRating(parseInt(e.target.value, 10))}
+            className="bg-white bg-opacity-15 mx-10 px-10 py-5 items-center justify-center flex"
+          />
         </div>
-      ) : (
         <div>
-          <h3>Add Review</h3>
-          <form onSubmit={handleSubmit}>
-            <div className="flex flex-row  justify-center items-start py-10">
-              <label htmlFor="userName">Writing As:</label>
-
-              <p className="mx-10  items-center ">{user.displayName}</p>
-
-              <label htmlFor="userLevel">Level:</label>
-              <select
-                id="userLevel"
-                value={userLevel}
-                onChange={(e) => setUserLevel(e.target.value)}
-                required
-                className="bg-white bg-opacity-15 mx-10 px-10 py-5 items-center justify-center flex"
-              >
-                <option value="beginner">Beginner</option>
-                <option value="intermediate">Intermediate</option>
-                <option value="professional">Professional</option>
-              </select>
-
-              <label htmlFor="rating">Rating (1 to 10):</label>
-              <input
-                type="number"
-                id="rating"
-                value={rating}
-                onChange={(e) => setRating(parseInt(e.target.value))}
-                min="1"
-                max="10"
-                required
-                className="bg-white bg-opacity-15 mx-10 px-10 py-5 items-center justify-center flex"
-              />
-
-              <label htmlFor="review">Review:</label>
-              <textarea
-                className="bg-white bg-opacity-15  mx-10 px-10 py-5 items-center justify-center flex"
-                id="review"
-                value={review}
-                placeholder="Write Review"
-                onChange={(e) => setReview(e.target.value)}
-                required
-              ></textarea>
-              <button
-                type="submit"
-                className="bg-teal-300 bg-opacity-5  p-5 rounded-lg items-center justify-center flex flex-col"
-              >
-                Submit Review
-              </button>
-            </div>
-          </form>
+          <label>Review:</label>
+          <textarea
+            className="bg-white bg-opacity-15  mx-10 px-10 py-5 items-center justify-center flex"
+            placeholder="Write Review"
+            required
+            value={reviewText}
+            onChange={(e) => setReviewText(e.target.value)}
+          />
         </div>
-      )}
+        <button
+          className="bg-teal-300 bg-opacity-5  p-5 rounded-lg items-center justify-center flex flex-col"
+          onClick={handleAddReview}
+        >
+          Submit Review
+        </button>
+      </div>
     </div>
   );
 };

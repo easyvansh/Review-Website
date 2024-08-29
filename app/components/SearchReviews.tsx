@@ -1,24 +1,21 @@
+"use client"
 import React, { useState } from "react";
 import db from "@/utils/firestore.js";
 import { collection, query, where, getDocs } from "firebase/firestore";
-import { Result } from "postcss";
 
-const SearchReviews = () => {
+import { useRouter } from 'next/navigation';
+import SearchResults from "../search-results/page";
+
+const SearchReviews = ({ onSearchResults }) => {
   const [searchTerm, setSearchTerm] = useState("");
   const [filter, setFilter] = useState("ice rink");
   const [searchResults, setSearchResults] = useState([]);
-
+  const router = useRouter();
   const handleSearch = async (event) => {
     event.preventDefault();
 
-    try {
-      const reviewsCollection = collection(db, "reviews");
-      const q = query(reviewsCollection, where(filter, "==", searchTerm));
-      const querySnapshot = await getDocs(q);
-      const results = querySnapshot.docs.map((doc) => ({ ...doc.data(), id: doc.id }));
-      setSearchResults(results);
-    } catch (error) {
-      console.error("Error fetching search results: ", error);
+    if (searchTerm.trim() !== "") {
+      router.push(`/search-results?q=${encodeURIComponent(searchTerm)}`);
     }
   };
     console.log(searchResults)
@@ -30,34 +27,26 @@ const SearchReviews = () => {
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
           placeholder="Search..."
-          className="border p-2 rounded-lg w-full  bg-inherit"
+          className="border py-4 rounded-lg w-full  bg-inherit"
         />
         <select
           value={filter}
           onChange={(e) => setFilter(e.target.value)}
-          className="border p-2 rounded-lg  bg-inherit"
+          className="border px-4 py-4 rounded-lg  bg-inherit"
         >
-          <option value="ice rink" className="">Ice Rink</option>
-          <option value="coach">Coach</option>
-          <option value="club">Club</option>
+          <option value="ice rink" className="bg-black">Ice Rink</option>
+          <option value="coach" className="bg-black">Coach</option>
+          <option value="club" className="bg-black">Club</option>
         </select>
         <button
           type="submit"
-          className="bg-teal-500 text-white px-4 py-2 rounded-lg"
+          className="bg-slate-600 text-white px-4 py-4 rounded-lg "
         >
           Search
         </button>
       </form>
       
-      <ul className="space-y-4">
-        {searchResults.map((item) => (
-          <li key={item.id} className="bg-white shadow-md p-6 rounded-lg">
-            <h3 className="text-lg font-semibold">{item.userName}</h3>
-            <p className="text-gray-500">{item.review}</p>
-            {/* Display more details as needed */}
-          </li>
-        ))}
-      </ul>
+   
     </div>
   );
 };
