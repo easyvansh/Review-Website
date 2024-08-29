@@ -3,8 +3,7 @@
 import React, { useEffect, useState } from "react";
 import { UserAuth } from "../context/AuthContext";
 import Spinner from "../components/Spinner";
-import Image from "next/image";
-import { doc, getDoc } from "firebase/firestore";
+import { collection, query, where, getDocs } from "firebase/firestore";
 import db from "@/utils/firestore";
 
 const UserProfile = () => {
@@ -17,11 +16,17 @@ const UserProfile = () => {
       setLoading(true);
       if (user && user.uid) {
         try {
-          const userDocRef = doc(db, "users", user.uid);
-          const userDocSnap = await getDoc(userDocRef);
-          
-          if (userDocSnap.exists()) {
-            setUserDoc(userDocSnap.data());
+          const q = query(
+            collection(db, "users"),
+            where("uid", "==", user.uid)
+          );
+          const querySnapshot = await getDocs(q);
+
+          if (!querySnapshot.empty) {
+            // Assuming there is only one document for the user
+            const userData = querySnapshot.docs[0].data();
+            setUserDoc(userData);
+            console.log(userData);
           } else {
             console.log("No such document!");
           }
@@ -37,26 +42,30 @@ const UserProfile = () => {
 
   if (loading) return <Spinner />;
 
-  if (!user) return <p>You must be logged in to view this page - protected route.</p>;
+  if (!user)
+    return <p>You must be logged in to view this page - protected route.</p>;
 
   return (
-    <div className="p-4 h-screen w-screen flex flex-col justify-center items-center">
+    <div className="p-4 h-screen w-screen flex flex-col  items-center">
       {user.photoURL && (
-        <Image
+        <img
           src={user.photoURL}
-          width={50}
-          height={50}
+          width={150}
+          height={150}
           alt="User profile"
-          className="my-20"
+          className="my-20 rounded-3xl"
         />
       )}
       <p>
-        Welcome, {user.displayName?.split(" ")[0] || "User"} - you are logged in to the
-        profile page - a protected route.
+        Welcome, {user.displayName?.split(" ")[0] || "User"} - you are logged in
+        to the profile page - a protected route.
       </p>
       <br />
-      {userDoc && userDoc.level && (
-        <p>Your Skating Level is {userDoc.level}</p>
+      {userDoc && (
+        <>
+          <p>Your Skating Level is {userDoc.level}</p>
+          <p>Your Email is {userDoc.email}</p>
+        </>
       )}
     </div>
   );
