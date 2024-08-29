@@ -46,3 +46,25 @@ h2{
   font-size: 2.5em;
   
 }
+
+select {
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+  background-color: slateblue;
+  padding: 0.5em;
+  /* Remove default arrow */
+  /* Add custom arrow */
+}
+
+input {
+  background-color:slateblue;
+  padding: 0.5em;
+  
+}
+
+textarea{
+  background-color:slateblue;
+  padding: 0.5em;
+  
+}
