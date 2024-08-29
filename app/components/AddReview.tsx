@@ -16,7 +16,14 @@ const AddReview = () => {
   const [loading, setLoading] = useState(true);
 
   // Reviews Database - Icon - Name (Level) - Rating - Date - Review Text
-
+  // entities/{entityId}/reviews: {
+  //   reviewId: {
+  //     userId: string, // Reference to user document
+  //     rating: number,
+  //     reviewText: string,
+  //     createdAt: timestamp
+  //   }
+  // }
   const handleSubmit = async (event) => {
     event.preventDefault();
 
