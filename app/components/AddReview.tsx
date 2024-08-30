@@ -1,8 +1,17 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import { UserAuth } from "../context/AuthContext"; // Ensure this import path is correct
-import { collection, addDoc, serverTimestamp, getDocs, where, query } from "firebase/firestore";
+import { UserAuth } from "../context/AuthContext";
+import {
+  collection,
+  addDoc,
+  serverTimestamp,
+  getDocs,
+  where,
+  query,
+  doc,
+  updateDoc,
+} from "firebase/firestore";
 import db from "@/utils/firestore";
 
 const AddReview = ({ entityId }) => {
@@ -14,7 +23,6 @@ const AddReview = ({ entityId }) => {
 
   useEffect(() => {
     const fetchUserData = async () => {
-      
       if (user && user.uid) {
         try {
           const q = query(
@@ -24,7 +32,6 @@ const AddReview = ({ entityId }) => {
           const querySnapshot = await getDocs(q);
 
           if (!querySnapshot.empty) {
-            // Assuming there is only one document for the user
             const userData = querySnapshot.docs[0].data();
             setUserDoc(userData);
             console.log(userData);
@@ -52,8 +59,8 @@ const AddReview = ({ entityId }) => {
     }
 
     try {
+      // Add the review to the reviews subcollection
       const reviewRef = collection(db, `entities/${entityId}/reviews`);
-      console.log(user);
       await addDoc(reviewRef, {
         userName: user.displayName,
         userId: user.uid,
@@ -61,9 +68,30 @@ const AddReview = ({ entityId }) => {
         userLevel: userDoc.level,
         rating,
         reviewText,
-        createdAt: new Date(),
+        createdAt: serverTimestamp(),
       });
-      console.log("Document written with ID: ", reviewRef.id);
+
+      // Fetch all reviews to calculate the new average rating and increment review count
+      const reviewsSnapshot = await getDocs(reviewRef);
+      const reviewCount = reviewsSnapshot.size;
+
+      let totalRating = 0;
+      reviewsSnapshot.forEach((doc) => {
+        totalRating += doc.data().rating;
+      });
+
+      const avgRating = totalRating / reviewCount;
+
+      // Update the entity document with the new review count and average rating
+      const entityDocRef = doc(db, "entities", entityId);
+      await updateDoc(entityDocRef, {
+        reviewCount,
+        avgRating,
+      });
+
+      console.log("Review added and entity updated successfully");
+
+      // Reset form
       setRating(0);
       setReviewText("");
       setError("");
@@ -74,37 +102,40 @@ const AddReview = ({ entityId }) => {
   };
 
   return (
-    <div className="flex flex-col gap-4">
-      <h3>Add Review</h3>
-      <div className="flex flex-row  justify-center items-start py-10">
-        <label htmlFor="userName">Writing As:</label>
-
-        <p className="mx-10  items-center ">{user.userName}</p>
+    <div className="flex flex-col ">
+      <h3 className="text-xl mb-2">Add Review</h3>
+      <div className="flex flex-row  items-start py-4">
+        <label htmlFor="userName" className="text-lg">
+          Writing As:
+        </label>
+        <p className="mx-10 items-center text-lg">{user?.displayName}</p>
 
         {error && <p style={{ color: "red" }}>{error}</p>}
-        <div>
-          <label htmlFor="rating">Rating (1 to 10):</label>
-          <input
-            type="number"
-            min="1"
-            max="10"
-            value={rating}
-            onChange={(e) => setRating(parseInt(e.target.value, 10))}
-            className="bg-white bg-opacity-15 mx-10 px-10 py-5 items-center justify-center flex"
-          />
-        </div>
-        <div>
-          <label>Review:</label>
-          <textarea
-            className="bg-white bg-opacity-15  mx-10 px-10 py-5 items-center justify-center flex"
-            placeholder="Write Review"
-            required
-            value={reviewText}
-            onChange={(e) => setReviewText(e.target.value)}
-          />
-        </div>
+
+        <label htmlFor="rating" className="text-lg ">
+          Rating (1 to 10):
+        </label>
+        <input
+          type="number"
+          min="1"
+          max="10"
+          value={rating}
+          onChange={(e) => setRating(parseInt(e.target.value, 10))}
+          className="bg-white bg-opacity-15 mx-10 px-10  items-center justify-center "
+        />
+        <label htmlFor="rating" className=" text-lg ">
+          Review:
+        </label>
+        <textarea
+          className="bg-white bg-opacity-15 mx-10 px-10  items-start justify-center "
+          placeholder="Write Review"
+          required
+          value={reviewText}
+          onChange={(e) => setReviewText(e.target.value)}
+        />
+
         <button
-          className="bg-teal-300 bg-opacity-5  p-5 rounded-lg items-center justify-center flex flex-col"
+          className="bg-slate-200 bg-opacity-5 p-5 rounded-lg items-center justify-center flex flex-col"
           onClick={handleAddReview}
         >
           Submit Review
