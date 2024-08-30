@@ -33,23 +33,29 @@ const AllEntitiesPage = () => {
 
   return (
     <div className = "flex flex-col h-screen text-white justify-center items-center">
-      <h1 className="font-bold text-3xl" >All Entities</h1>
-      <ul className = "flex flex-col gap-4"> 
-        {entities.map(entity => (
-          <li key={entity.id}>
-            <Link href={`/entities/${entity.id}`}>
-              
-                <h2>{entity.title}</h2>
-                <p>{entity.description}</p>
-                <img src={entity.iconUrl} alt={entity.title} style={{ width: '100px', height: '100px' }} />
-                <p>Type: {entity.type}</p>
-                <p>Average Rating: {entity.avgRating}</p>
-                <p>Reviews Count: {entity.reviewCount}</p>
-              
-            </Link>
-          </li>
-        ))}
-      </ul>
+       <h1 className="text-2xl font-bold mb-4">All Entities</h1>
+     
+      
+        <ul className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          {entities.map((entity) => (
+            <li key={entity.id} className="border rounded-lg p-4 hover:shadow-lg transition-shadow">
+              <Link href={`/entities/${entity.id}`}>
+                <div className="flex items-center mb-2">
+                  <img src={entity.iconUrl} alt={entity.name} className="w-16 h-16 object-cover rounded-full mr-4" />
+                  <div>
+                    <h2 className="text-xl font-semibold">{entity.name}</h2>
+                    <p className="text-sm text-gray-600">{entity.type}</p>
+                  </div>
+                </div>
+                <p className="text-sm mb-2">{entity.description}</p>
+                <div className="flex items-center text-sm text-gray-600">
+                  <span className="mr-2">Rating: {entity.avgRating.toFixed(1)}</span>
+                  <span>Reviews: {entity.reviewCount}</span>
+                </div>
+              </Link>
+            </li>
+          ))}
+        </ul>
     </div>
   );
 };
